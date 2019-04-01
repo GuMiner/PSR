@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@section Headers {
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#notesCollapse" style="padding: 1px;">Notes</button>
+}
+
+<div class="container-fluid">
+    <div class="row-auto">
+        <div class="col-auto" style="flex: unset;">
+            <p>
+                <div class="collapse" id="notesCollapse" style="transition-duration: 0.05s;">
+                    Hi there!
+                </div>
+            </p>
+        </div>
+    </div>
+</div>

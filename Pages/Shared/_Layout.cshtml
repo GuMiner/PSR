@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="/favicon.png">
+    <title>PSR</title>
+
+    <!-- Bootstrap init -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <link href="~/Lib/bootstrap-4.0/css/bootstrap.min.css" rel="stylesheet" />
+
+    @RenderSection("StyleSheets", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-dark navbar-expand-sm bg-info py-0">
+        <a class="navbar-brand" href="/">PSR</a>
+        <ul class="navbar-nav mr-auto">
+            <!-- Pretty version is too big... <li class="nav-item px-2"><div class="nav-link">Puzzle Solving Routines</div></li> -->
+            @RenderSection("Headers", required: true)
+        </ul>
+
+        <span class="navbar-text"><a href="/"><img src="/LogoHeader.png" /></a></span>
+    </nav>
+
+    <!--Main Page-->
+    <!--Bootstrap (slim jQuery, popper, and bootstrap itself)-->
+    <script src="~/Lib/jquery-3.0/jquery-3.0.0.slim.min.js"></script>
+    <script src="~/Lib/popper-1.12/popper.min.js"></script>
+    <script src="~/Lib/bootstrap-4.0/js/bootstrap.min.js"></script>
+
+    @RenderBody()
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md-auto text-center">
+                <small>Site Copyright © Gustave Granroth, @(DateTime.UtcNow.Year).</small>
+            </div>
+            <div class="col-md-auto text-center">
+                <small><a href="mailto:gus.gran@helium24.net">Webmaster</a></small>
+            </div>
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
