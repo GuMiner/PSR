@@ -24,11 +24,7 @@ namespace PSR
         {
             // Always in developer mode.
             app.UseDeveloperExceptionPage();
-            app.UseHsts();
-
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseMvc();
         }
     }
