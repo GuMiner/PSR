@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "removeComments": false,
+        "strictNullChecks": true,
+        "sourceMap": true,
+        "target": "es5",
+        "module": "amd",
+        "outDir": "./wwwroot/scripts"
+    },
+    "compileOnSave": true,
+    "files": [
+        "./scripts/app.ts",
+        "./scripts/require-config.ts"
+    ]
+}

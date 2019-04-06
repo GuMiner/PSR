@@ -7,7 +7,11 @@ echo a
 echo cd /home/helium24/psrdrop
 echo lcd C:\Users\Gustave\Desktop\Projects\PuzzleSolveR\PSRdrop
 echo put -o PSR.dll
-echo put -o PSR.Views.dll) | sftpc root@178.62.0.195:22 > nul
+echo put -o PSR.Views.dll
+echo cd /home/helium24/psrdrop/wwwroot
+echo lcd C:\Users\Gustave\Desktop\Projects\PuzzleSolveR\PSRdrop\wwwroot
+echo put -o scripts
+) | sftpc root@178.62.0.195:22 > nul
 
 echo Starting PSR...
 echo a | sexec root@178.62.0.195:22 -cmd="supervisorctl start psr" > nul

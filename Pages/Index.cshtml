@@ -4,16 +4,12 @@
     ViewData["Title"] = "Home page";
 
     var substitutionCollapse = "substitutionCollapse";
-
-    var A1Z26 = "A1Z26";
-    var Rot13 = "Rot13";
-    var Ascii = "Ascii";
-    var Input = "Input";
-    var Output = "Output";
+    var listButton = "list-group-item list-group-item-action";
+    var noSelectStyle = "style=\"-ms-user-select: none; user-select: none; -moz-user-select: none; -webkit-user-select: none;\"";
 }
 
 @section Headers {
-    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@substitutionCollapse" style="padding: 1px;">Subst</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@substitutionCollapse" style="padding: 1px;">Substitution</button>
 }
 
 <div class="container-fluid">
@@ -23,7 +19,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">I:</span>
                 </div>
-                <textarea class="form-control" id="@Input" style="height:250px;"></textarea>
+                <textarea class="form-control" type="text" data-bind="value: input, valueUpdate: 'afterkeydown'" style="height:250px;"></textarea>
             </div>
         </div>
         <div class="col">
@@ -31,27 +27,42 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">O:</span>
                 </div>
-                <textarea class="form-control" id="@Output" style="height:250px;"></textarea>
+                <textarea class="form-control" type="text" data-bind="value: global.outputGlobal" style="height:250px;"></textarea>
             </div>
         </div>
     </div>
     <div class="collapse" id="@substitutionCollapse" style="transition-duration: 0.05s;">
         <div class="row">
             <div class="col">
-                Converters:
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">O:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: subst.output" style="height:250px;"></textarea>
+                </div>
             </div>
             <div class="col-sm-auto">
                 <div class="list-group">
-                    <a id="@A1Z26" class="list-group-item list-group-item-action active">A1 - Z26</a>
-                    <a id="@Rot13" class="list-group-item list-group-item-action active">Rot 13</a>
-                    <a id="@Ascii" class="list-group-item list-group-item-action">ASCII</a>
+                    <a data-bind="css: subst.letterToNumberActive, click: utility.toggler.bind($data, subst.letterToNumberActive)" class="@listButton active" @Html.Raw(noSelectStyle)>A1 - Z26</a>
+                    <a data-bind="css: subst.rotate13Active, click: utility.toggler.bind($data, subst.rotate13Active)" class="@listButton active" @Html.Raw(noSelectStyle)>Rotate</a>
+                </div>
+                <input data-bind="value: subst.rotateValue, valueUpdate: 'afterkeydown'" />
+                <div class="list-group">
+                    <a data-bind="css: subst.aciiActive, click: utility.toggler.bind($data, subst.aciiActive)" class="@listButton active" @Html.Raw(noSelectStyle)>ASCII</a>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-auto">
+                        Delimiter:
+                        <input data-bind="value: subst.delimiter, valueUpdate: 'afterkeydown'" style="width: 80px;" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            More 
+            More
         </div>
         <div class="col">
             In
@@ -63,109 +74,7 @@
 </div>
 
 @section Scripts {
-    <!-- TODO: Investigate moving to typescript instead of JQuery. That should simplify a lot of the back and forth boilerplate here -->
-    <script type="text/javascript" src="~/Lib/es6-promise-auto-4.2/es6-promise.auto.min.js"></script>
-    <script type="text/javascript" src="~/Lib/axios-0.17/axios.min.js"></script>
-
-    <!-- Show camera-->
-    <script type="text/javascript">
-        var a1z26Active = true;
-
-        $("#@A1Z26").click(function () {
-            a1z26Active = !a1z26Active;
-            if (a1z26Active) {
-                $("#@A1Z26").addClass("active")
-            } else {
-                $("#@A1Z26").removeClass("active")
-            }
-
-            UpdateOutput();
-        });
-
-        var rot13Active = true;
-
-        $("#@Rot13").click(function () {
-            rot13Active = !rot13Active;
-            if (rot13Active) {
-                $("#@Rot13").addClass("active")
-            } else {
-                $("#@Rot13").removeClass("active")
-            }
-
-            UpdateOutput();
-        });
-
-        var asciiActive = false;
-
-        $("#@Ascii").click(function () {
-            asciiActive = !asciiActive;
-            if (asciiActive) {
-                $("#@Ascii").addClass("active")
-            } else {
-                $("#@Ascii").removeClass("active")
-            }
-
-            UpdateOutput();
-        });
-
-        function UpdateOutput() {
-            var text = $("#@Input").val();
-
-            // TODO: Delimiter should be configurable, rot 13 should really be rot-n
-            var parts = text.split(" ");
-            var a1z26String = "";
-            if (a1z26Active) {
-                for (var i = 0; i < parts.length; i++) {
-                    var integer = parseInt(parts[i]);
-                    if (isNaN(integer)) {
-                        a1z26String += parts[i];
-                    } else {
-                        a1z26String += String.fromCharCode(64 + integer);
-                    }
-
-                    a1z26String += " ";
-                }
-            }
-
-            var rot13String = "";
-            if (rot13Active) {
-                for (var i = 0; i < parts.length; i++) {
-                    if (parts[i].length == 1) {
-                        var charValue = parts[i].toUpperCase().charCodeAt(0)
-                        charValue += 13;
-                        if (charValue > "Z".charCodeAt(0)) {
-                            charValue -= 26;
-                        }
-
-                        rot13String += String.fromCharCode(charValue);
-                    } else {
-                        rot13String += parts[i];
-                    }
-
-                    rot13String += " ";
-                }
-            }
-
-            var asciiString = "";
-            if (asciiActive) {
-                for (var i = 0; i < parts.length; i++) {
-                    var integer = parseInt(parts[i]);
-                    if (isNaN(integer)) {
-                        asciiString += parts[i];
-                    } else {
-                        asciiString += String.fromCharCode(integer);
-                    }
-
-                    asciiString += " ";
-                }
-            }
-
-            var combinedString = a1z26String + "\n" + rot13String + "\n" + asciiString;
-            $("#@Output").val(combinedString);
-        }
-
-        $("#@Input").on('change keyup paste', function () {
-            UpdateOutput();
-        });
-    </script>
+    <script type="text/javascript" src="~/Lib/requirejs-2.3.6/require.js"></script>
+    <script type="text/javascript" src="~/scripts/require-config.js"></script>
+    <script type="text/javascript">require(["scripts/app"])</script>
 }

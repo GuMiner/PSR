@@ -2,16 +2,36 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="scripts\app.ts" />
+    <None Remove="scripts\require-config.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="scripts\knockout-ts-3.4.0\knockout.d.ts" />
+  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App"/>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="scripts\app.ts" />
+    <TypeScriptCompile Include="scripts\require-config.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="scripts\knockout-ts-3.4.0\" />
+    <Folder Include="wwwroot\Lib\knockout-3.4.2\" />
+    <Folder Include="wwwroot\Lib\requirejs-2.3.6\" />
+    <Folder Include="wwwroot\scripts\" />
   </ItemGroup>
   
 
-    <Target Name="RemotePublish" AfterTargets="FileSystemPublish" >
-        <Message Text="Pushing to the PSR server..." Importance="high"/>
+    <Target Name="RemotePublish" AfterTargets="FileSystemPublish">
+        <Message Text="Pushing to the PSR server..." Importance="high" />
         <Exec Command="publish.bat" />
     </Target>
 </Project>

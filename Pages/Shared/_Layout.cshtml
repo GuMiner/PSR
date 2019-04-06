@@ -8,8 +8,6 @@
     <!-- Bootstrap init -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <link href="~/Lib/bootstrap-4.0/css/bootstrap.min.css" rel="stylesheet" />
-
-    @RenderSection("StyleSheets", required: false)
 </head>
 <body>
     <nav class="navbar navbar-dark navbar-expand-sm bg-info py-0">
@@ -23,9 +21,7 @@
     </nav>
 
     <!--Main Page-->
-    <!--Bootstrap (slim jQuery, popper, and bootstrap itself)-->
-    <script src="~/Lib/jquery-3.0/jquery-3.0.0.slim.min.js"></script>
-    <script src="~/Lib/popper-1.12/popper.min.js"></script>
+    <script src="~/Lib/jquery-3.2.1/jquery-3.2.1.slim.min.js"></script>
     <script src="~/Lib/bootstrap-4.0/js/bootstrap.min.js"></script>
 
     @RenderBody()
@@ -40,6 +36,6 @@
         </div>
     </div>
 
-    @RenderSection("Scripts", required: false)
+    @RenderSection("Scripts", required: true)
 </body>
 </html>
