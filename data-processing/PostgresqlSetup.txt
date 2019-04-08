@@ -1,0 +1,37 @@
+Setup:
+
+su - postgres
+CREATE EXTENSION pg_trgm; // Out of order setup for later.
+createuser --interactive --pwprompt
+
+ALTER USER helium24 WITH ENCRYPTED PASSWORD 'FromSavedCacheFile'
+
+nano pg_hba.conf
+>> ADD
+local all helium24 md5
+<<
+
+(Get PGAdmin4 and set it up!)
+
+'words' db
+'words' table
+>>
+CREATE TABLE public.words
+(
+    id serial NOT NULL,
+    word character varying(70),
+    PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.words
+    OWNER to helium24;
+<<
+
+(Copy over words file to /home)
+cd /home
+psql -U helium24 -d words
+\copy public.words (word) FROM /home/wordsFile.txt
+

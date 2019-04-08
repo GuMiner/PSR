@@ -6,15 +6,19 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="scripts\app.ts" />
+    <None Remove="scripts\axios\axios.d.ts" />
     <None Remove="scripts\require-config.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scripts\knockout-ts-3.4.0\knockout.d.ts" />
+    <Content Include="scripts\axios\axios.d.ts" />
+    <Content Include="scripts\knockout\knockout.d.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Npgsql" Version="4.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="scripts\knockout-ts-3.4.0\" />
+    <Folder Include="scripts\knockout\" />
     <Folder Include="wwwroot\Lib\knockout-3.4.2\" />
     <Folder Include="wwwroot\Lib\requirejs-2.3.6\" />
     <Folder Include="wwwroot\scripts\" />

@@ -1,5 +1,7 @@
-﻿/// <reference path="knockout-ts-3.4.0/knockout.d.ts" />
+﻿/// <reference path="axios/axios.d.ts" />
+/// <reference path="knockout/knockout.d.ts" />
 
+import * as axios from 'axios';
 import * as ko from "knockout";
 
 class GlobalModel {
@@ -103,6 +105,52 @@ class SubstitutionModel {
     }
 }
 
+interface WordSearchResult {
+    count: number,
+    results: string[],
+    errorMessage: string
+}
+
+class WordSearchModel {
+    query: KnockoutObservable<string>
+
+    output: KnockoutObservable<string>
+    resultCount: KnockoutObservable<string>
+    dbStatus: KnockoutObservable<string>
+
+    outputProcessor: KnockoutObservable<string>
+
+    constructor() {
+        this.query = ko.observable("");
+        this.resultCount = ko.observable("0");
+        this.dbStatus = ko.observable("Idler");
+        this.output = ko.observable("");
+
+        this.outputProcessor = ko.computed(() => {
+            this.dbStatus("Querying...");
+
+            let encodedQuery = encodeURIComponent(this.query());
+            axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
+                .then((response) => {
+                    let data: WordSearchResult = response.data
+
+                    if (data.count < 0) {
+                        this.dbStatus("Query error: " + data.errorMessage);
+                    } else {
+                        this.dbStatus("Idle");
+                        this.resultCount(data.count.toString());
+                        this.output(data.results.join("\n"));
+                    }
+                })
+                .catch((err) => {
+                    this.dbStatus("Error: " + JSON.stringify(err));
+                });
+
+            return encodedQuery;
+        })
+    }
+}
+
 class UtilityModel {
     toggler: (item: KnockoutObservable<string>) => void
 
@@ -123,6 +171,7 @@ class MainModel {
     global: GlobalModel
     utility: UtilityModel
     subst: SubstitutionModel
+    wordSearch: WordSearchModel
 
     constructor() {
         this.input = ko.observable("");
@@ -130,6 +179,7 @@ class MainModel {
         this.global = new GlobalModel(this.input);
         this.utility = new UtilityModel();
         this.subst = new SubstitutionModel(this.input);
+        this.wordSearch = new WordSearchModel();
     }
 }
 
