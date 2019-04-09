@@ -13,6 +13,7 @@ local all helium24 md5
 
 (Get PGAdmin4 and set it up!)
 
+===== Words =====
 'words' db
 'words' table
 >>
@@ -35,3 +36,20 @@ cd /home
 psql -U helium24 -d words
 \copy public.words (word) FROM /home/wordsFile.txt
 
+----- Crosswords -----
+CREATE TABLE public.crosswords
+(
+    id serial NOT NULL,
+    clue text,
+    answer text,
+    PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.crosswords
+    OWNER to helium24;
+
+psql -U helium24 -d words
+\copy public.crosswords (clue,answer) FROM /home/crosswords_all.csv WITH (FORMAT csv)

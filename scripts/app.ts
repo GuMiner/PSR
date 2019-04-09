@@ -151,6 +151,56 @@ class WordSearchModel {
     }
 }
 
+interface CrosswordSearchResult {
+    count: number,
+    clueResults: string[],
+    answerResults: string[],
+    errorMessage: string
+}
+
+class CrosswordSearchModel {
+    query: KnockoutObservable<string>
+
+    clueOutput: KnockoutObservable<string>
+    answerOutput: KnockoutObservable<string>
+    resultCount: KnockoutObservable<string>
+    dbStatus: KnockoutObservable<string>
+
+    outputProcessor: KnockoutObservable<string>
+
+    constructor() {
+        this.query = ko.observable("");
+        this.resultCount = ko.observable("0");
+        this.dbStatus = ko.observable("Idler");
+        this.clueOutput = ko.observable("");
+        this.answerOutput = ko.observable("");
+
+        this.outputProcessor = ko.computed(() => {
+            this.dbStatus("Querying...");
+
+            let encodedQuery = encodeURIComponent(this.query());
+            axios.get("/api/CrosswordSearch/FindMatchingWords?search=" + encodedQuery)
+                .then((response) => {
+                    let data: CrosswordSearchResult = response.data
+
+                    if (data.count < 0) {
+                        this.dbStatus("Query error: " + data.errorMessage);
+                    } else {
+                        this.dbStatus("Idle");
+                        this.resultCount(data.count.toString());
+                        this.clueOutput(data.clueResults.join("\n"));
+                        this.answerOutput(data.answerResults.join("\n"));
+                    }
+                })
+                .catch((err) => {
+                    this.dbStatus("Error: " + JSON.stringify(err));
+                });
+
+            return encodedQuery;
+        })
+    }
+}
+
 class UtilityModel {
     toggler: (item: KnockoutObservable<string>) => void
 
@@ -172,6 +222,7 @@ class MainModel {
     utility: UtilityModel
     subst: SubstitutionModel
     wordSearch: WordSearchModel
+    crosswordSearch: CrosswordSearchModel
 
     constructor() {
         this.input = ko.observable("");
@@ -180,6 +231,7 @@ class MainModel {
         this.utility = new UtilityModel();
         this.subst = new SubstitutionModel(this.input);
         this.wordSearch = new WordSearchModel();
+        this.crosswordSearch = new CrosswordSearchModel();
     }
 }
 

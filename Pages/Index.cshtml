@@ -5,6 +5,7 @@
 
     var substitutionCollapse = "substitutionCollapse";
     var wordSearchCollapse = "wordSearchCollapse";
+    var crosswordSearchCollapse = "crosswordSearchCollapse";
 
     var listButton = "list-group-item list-group-item-action";
     var minimalisticPadding = "padding: 1px; margin: 2px;";
@@ -13,7 +14,8 @@
 
 @section Headers {
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@substitutionCollapse" style=" @Html.Raw(minimalisticPadding)">Substitution</button>
-    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordSearchCollapse"  style=" @Html.Raw(minimalisticPadding)">Word Search</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Word Search</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@crosswordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Crossword Search</button>
 }
 
     <div class="container-fluid">
@@ -86,6 +88,40 @@
                     </div>
                     <div class="row alert alert-info">
                         <span data-bind="text: wordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="collapse" id="@crosswordSearchCollapse" style="transition-duration: 0.05s;">
+            <div class="row">
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Q:</span>
+                        </div>
+                        <textarea class="form-control" type="text" data-bind="value: crosswordSearch.clueOutput" style="height:250px;"></textarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">A:</span>
+                        </div>
+                        <textarea class="form-control" type="text" data-bind="value: crosswordSearch.answerOutput" style="height:250px;"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-auto">
+                    <div class="row">
+                        Query
+                    </div>
+                    <div class="row">
+                        <input data-bind="value: crosswordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
+                    </div>
+                    <div class="row alert alert-success">
+                        <span data-bind="text: crosswordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
+                    </div>
+                    <div class="row alert alert-info">
+                        <span data-bind="text: crosswordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
                     </div>
                 </div>
             </div>

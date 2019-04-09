@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace H24.Modules
 {
     /// <summary>
-    /// Module for retrieving the status of various server resources.
+    /// Module for word search results
     /// </summary>
     [ApiController]
     [Route("api/[controller]/[action]")]

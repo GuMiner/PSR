@@ -122,6 +122,38 @@ define(["require", "exports", "axios", "knockout"], function (require, exports, 
         }
         return WordSearchModel;
     }());
+    var CrosswordSearchModel = /** @class */ (function () {
+        function CrosswordSearchModel() {
+            var _this = this;
+            this.query = ko.observable("");
+            this.resultCount = ko.observable("0");
+            this.dbStatus = ko.observable("Idler");
+            this.clueOutput = ko.observable("");
+            this.answerOutput = ko.observable("");
+            this.outputProcessor = ko.computed(function () {
+                _this.dbStatus("Querying...");
+                var encodedQuery = encodeURIComponent(_this.query());
+                axios.get("/api/CrosswordSearch/FindMatchingWords?search=" + encodedQuery)
+                    .then(function (response) {
+                    var data = response.data;
+                    if (data.count < 0) {
+                        _this.dbStatus("Query error: " + data.errorMessage);
+                    }
+                    else {
+                        _this.dbStatus("Idle");
+                        _this.resultCount(data.count.toString());
+                        _this.clueOutput(data.clueResults.join("\n"));
+                        _this.answerOutput(data.answerResults.join("\n"));
+                    }
+                })
+                    .catch(function (err) {
+                    _this.dbStatus("Error: " + JSON.stringify(err));
+                });
+                return encodedQuery;
+            });
+        }
+        return CrosswordSearchModel;
+    }());
     var UtilityModel = /** @class */ (function () {
         function UtilityModel() {
             this.toggler = function (item) {
@@ -142,6 +174,7 @@ define(["require", "exports", "axios", "knockout"], function (require, exports, 
             this.utility = new UtilityModel();
             this.subst = new SubstitutionModel(this.input);
             this.wordSearch = new WordSearchModel();
+            this.crosswordSearch = new CrosswordSearchModel();
         }
         return MainModel;
     }());
