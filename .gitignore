@@ -3,3 +3,5 @@ obj
 .vs
 *.user
 connectionString.txt
+wwwroot/scripts/app.js
+wwwroot/scripts/app.js.map

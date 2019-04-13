@@ -68,10 +68,10 @@ namespace H24.Modules
             }
         }
 
-        // TODO: Answers need to be ordered, app.config needs to list when throttling happens, words should wrap in the scrolling view, should have a separate count for answers and clues
+        // TODO: words should wrap in the scrolling view
         private List<string> GetClueResults(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE clue LIKE :queryToExecute LIMIT 200", connection);
+            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE clue LIKE :queryToExecute ORDER BY clue LIMIT 200", connection);
             command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
 
             List<string> words = new List<string>();
@@ -88,7 +88,7 @@ namespace H24.Modules
 
         private List<string> GetAnswerResults(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE answer LIKE :queryToExecute LIMIT 200", connection);
+            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE answer LIKE :queryToExecute ORDER BY clue LIMIT 200", connection);
             command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
 
             List<string> words = new List<string>();

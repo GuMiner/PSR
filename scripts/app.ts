@@ -113,6 +113,7 @@ interface WordSearchResult {
 
 class WordSearchModel {
     query: KnockoutObservable<string>
+    searchType: KnockoutObservable<boolean>
 
     output: KnockoutObservable<string>
     resultCount: KnockoutObservable<string>
@@ -121,33 +122,61 @@ class WordSearchModel {
     outputProcessor: KnockoutObservable<string>
 
     constructor() {
-        this.query = ko.observable("");
+        this.query = ko.observable("").extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+        this.searchType = ko.observable(true);
         this.resultCount = ko.observable("0");
         this.dbStatus = ko.observable("Idler");
         this.output = ko.observable("");
 
         this.outputProcessor = ko.computed(() => {
             this.dbStatus("Querying...");
-
+            console.log(this.query());
             let encodedQuery = encodeURIComponent(this.query());
-            axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
-                .then((response) => {
-                    let data: WordSearchResult = response.data
+            if (this.searchType()) { // == search
+                axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
+                    .then((response) => {
+                        let data: WordSearchResult = response.data
 
-                    if (data.count < 0) {
-                        this.dbStatus("Query error: " + data.errorMessage);
-                    } else {
-                        this.dbStatus("Idle");
-                        this.resultCount(data.count.toString());
-                        this.output(data.results.join("\n"));
-                    }
-                })
-                .catch((err) => {
-                    this.dbStatus("Error: " + JSON.stringify(err));
-                });
+                        if (data.count < 0) {
+                            this.dbStatus("Query error: " + data.errorMessage);
+                        } else {
+                            this.dbStatus("Idle");
+
+                            this.resultCount(this.GetResultCountText(data.count));
+                            this.output(data.results.join("\n"));
+                        }
+                    })
+                    .catch((err) => {
+                        this.dbStatus("Error: " + JSON.stringify(err));
+                    });
+            } else {
+                axios.get("/api/WordSearch/FindAnagrams?search=" + encodedQuery)
+                    .then((response) => {
+                        let data: WordSearchResult = response.data
+
+                        if (data.count < 0) {
+                            this.dbStatus("Query error: " + data.errorMessage);
+                        } else {
+                            this.dbStatus("Idle");
+                            this.resultCount(this.GetResultCountText(data.count));
+                            this.output(data.results.join("\n"));
+                        }
+                    })
+                    .catch((err) => {
+                        this.dbStatus("Error: " + JSON.stringify(err));
+                    });
+            }
 
             return encodedQuery;
         })
+    }
+
+    GetResultCountText(resultCount: number): string {
+        if (resultCount >= 200) {
+            return resultCount.toString() + " (limited!)";
+        }
+
+        return resultCount.toString();
     }
 }
 
@@ -169,7 +198,7 @@ class CrosswordSearchModel {
     outputProcessor: KnockoutObservable<string>
 
     constructor() {
-        this.query = ko.observable("");
+        this.query = ko.observable("").extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
         this.resultCount = ko.observable("0");
         this.dbStatus = ko.observable("Idler");
         this.clueOutput = ko.observable("");
@@ -187,7 +216,7 @@ class CrosswordSearchModel {
                         this.dbStatus("Query error: " + data.errorMessage);
                     } else {
                         this.dbStatus("Idle");
-                        this.resultCount(data.count.toString());
+                        this.resultCount(this.GetResultCountText(data.count));
                         this.clueOutput(data.clueResults.join("\n"));
                         this.answerOutput(data.answerResults.join("\n"));
                     }
@@ -198,6 +227,14 @@ class CrosswordSearchModel {
 
             return encodedQuery;
         })
+    }
+
+    GetResultCountText(resultCount: number): string {
+        if (resultCount >= 400) {
+            return resultCount.toString() + " (limited!)";
+        }
+
+        return resultCount.toString();
     }
 }
 

@@ -83,6 +83,9 @@
                     <div class="row">
                         <input data-bind="value: wordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
                     </div>
+                    <div class="row">
+                        <input type="checkbox" data-bind="checked: wordSearch.searchType" /> Uncheck for anagrams.
+                    </div>
                     <div class="row alert alert-success">
                         <span data-bind="text: wordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
                     </div>
