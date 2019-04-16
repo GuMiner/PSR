@@ -4,17 +4,9 @@
 import * as axios from 'axios';
 import * as ko from "knockout";
 
-class GlobalModel {
-    outputGlobal: KnockoutObservable<string>
-
-    constructor(input: KnockoutObservable<string>) {
-        this.outputGlobal = ko.pureComputed(() => {
-            return input();
-        }, this);
-    }
-}
-
 class SubstitutionModel {
+    input: KnockoutObservable<string>
+
     letterToNumberActive: KnockoutObservable<string>
     rotate13Active: KnockoutObservable<string>
     rotateValue: KnockoutObservable<string>
@@ -24,27 +16,30 @@ class SubstitutionModel {
 
     output: KnockoutObservable<string>
 
-    constructor(input: KnockoutObservable<string>) {
+    constructor() {
+        this.input = ko.observable("");
+
         this.letterToNumberActive = ko.observable("active");
         this.rotate13Active = ko.observable("active");
         this.rotateValue = ko.observable("13");
         this.aciiActive = ko.observable("active");
+
         this.delimiter = ko.observable(" ");
 
         this.output = ko.pureComputed(() => {
             let outputString = "";
-            let inputText = input();
+            let inputText = this.input();
             let parts = inputText.split(this.delimiter());
             if (this.letterToNumberActive()) {
-                outputString += SubstitutionModel.letterToNumber(parts);
+                outputString += SubstitutionModel.letterToNumber(parts) + "\r\n";
             }
 
             if (this.rotate13Active()) {
-                outputString += SubstitutionModel.rot13(parts, this.rotateValue());
+                outputString += SubstitutionModel.rot13(parts, this.rotateValue()) + "\r\n";
             }
 
             if (this.aciiActive()) {
-                outputString += SubstitutionModel.numberToAscii(parts);
+                outputString += SubstitutionModel.numberToAscii(parts) + "\r\n";
             }
 
             return outputString;
@@ -122,7 +117,7 @@ class WordSearchModel {
     outputProcessor: KnockoutObservable<string>
 
     constructor() {
-        this.query = ko.observable("").extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+        this.query = ko.observable("");
         this.searchType = ko.observable(true);
         this.resultCount = ko.observable("0");
         this.dbStatus = ko.observable("Idler");
@@ -130,7 +125,6 @@ class WordSearchModel {
 
         this.outputProcessor = ko.computed(() => {
             this.dbStatus("Querying...");
-            console.log(this.query());
             let encodedQuery = encodeURIComponent(this.query());
             if (this.searchType()) { // == search
                 axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
@@ -198,7 +192,7 @@ class CrosswordSearchModel {
     outputProcessor: KnockoutObservable<string>
 
     constructor() {
-        this.query = ko.observable("").extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+        this.query = ko.observable("");
         this.resultCount = ko.observable("0");
         this.dbStatus = ko.observable("Idler");
         this.clueOutput = ko.observable("");
@@ -238,6 +232,76 @@ class CrosswordSearchModel {
     }
 }
 
+class WordExtraModel {
+    query: KnockoutObservable<string>
+    searchType: KnockoutObservable<string>
+
+    output: KnockoutObservable<string>
+    resultCount: KnockoutObservable<string>
+    dbStatus: KnockoutObservable<string>
+
+    outputProcessor: KnockoutObservable<string>
+
+    constructor() {
+        this.query = ko.observable("");
+        this.searchType = ko.observable("thesaurus");
+        this.resultCount = ko.observable("0");
+        this.dbStatus = ko.observable("Idler");
+        this.output = ko.observable("");
+
+        this.outputProcessor = ko.computed(() => {
+            this.dbStatus("Querying...");
+            let encodedQuery = encodeURIComponent(this.query());
+            if (this.searchType() === "thesaurus") {
+                this.output(this.query() + "thesaurus");
+                //axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
+                //    .then((response) => {
+                //        let data: WordSearchResult = response.data
+                //
+                //        if (data.count < 0) {
+                //            this.dbStatus("Query error: " + data.errorMessage);
+                //        } else {
+                //            this.dbStatus("Idle");
+                //
+                //            this.resultCount(this.GetResultCountText(data.count));
+                //            this.output(data.results.join("\n"));
+                //        }
+                //    })
+                //    .catch((err) => {
+                //        this.dbStatus("Error: " + JSON.stringify(err));
+                //    });
+            } else { // Currently homophones, TODO add more types
+                this.output(this.query() + "homophones");
+                //axios.get("/api/WordSearch/FindAnagrams?search=" + encodedQuery)
+                //    .then((response) => {
+                //        let data: WordSearchResult = response.data
+                //
+                //        if (data.count < 0) {
+                //            this.dbStatus("Query error: " + data.errorMessage);
+                //        } else {
+                //            this.dbStatus("Idle");
+                //            this.resultCount(this.GetResultCountText(data.count));
+                //            this.output(data.results.join("\n"));
+                //        }
+                //    })
+                //    .catch((err) => {
+                //        this.dbStatus("Error: " + JSON.stringify(err));
+                //    });
+            }
+
+            return encodedQuery;
+        })
+    }
+
+    // GetResultCountText(resultCount: number): string {
+    //     if (resultCount >= 200) {
+    //         return resultCount.toString() + " (limited!)";
+    //     }
+    // 
+    //     return resultCount.toString();
+    // }
+}
+
 class UtilityModel {
     toggler: (item: KnockoutObservable<string>) => void
 
@@ -252,23 +316,40 @@ class UtilityModel {
     }
 }
 
-class MainModel {
+class EquationSolverModel {
     input: KnockoutObservable<string>
 
-    global: GlobalModel
+    additionActive: KnockoutObservable<string>
+    evaluate: () => void
+
+    output: KnockoutObservable<string>
+
+    constructor() {
+        this.input = ko.observable("");
+        this.output = ko.observable("");
+
+        this.additionActive = ko.observable("active");
+        this.evaluate = () => {
+            this.output(this.input() + this.additionActive());
+        };
+    }
+}
+
+class MainModel {
     utility: UtilityModel
     subst: SubstitutionModel
     wordSearch: WordSearchModel
     crosswordSearch: CrosswordSearchModel
+    wordExtra: WordExtraModel
+    equationSolver: EquationSolverModel
 
     constructor() {
-        this.input = ko.observable("");
-
-        this.global = new GlobalModel(this.input);
         this.utility = new UtilityModel();
-        this.subst = new SubstitutionModel(this.input);
+        this.subst = new SubstitutionModel();
         this.wordSearch = new WordSearchModel();
         this.crosswordSearch = new CrosswordSearchModel();
+        this.wordExtra = new WordExtraModel();
+        this.equationSolver = new EquationSolverModel();
     }
 }
 

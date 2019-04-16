@@ -20,11 +20,8 @@ local all helium24 md5
 CREATE TABLE public.words
 (
     id serial NOT NULL,
-    word character varying(70),
+    word character varying(70) NOT NULL,
     PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
 );
 
 ALTER TABLE public.words
@@ -40,12 +37,9 @@ psql -U helium24 -d words
 CREATE TABLE public.crosswords
 (
     id serial NOT NULL,
-    clue text,
-    answer text,
+    clue text NOT NULL,
+    answer text NOT NULL,
     PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
 );
 
 ALTER TABLE public.crosswords
@@ -53,3 +47,29 @@ ALTER TABLE public.crosswords
 
 psql -U helium24 -d words
 \copy public.crosswords (clue,answer) FROM /home/crosswords_all.csv WITH (FORMAT csv)
+
+---- Thesaurus ----
+CREATE TABLE public.thesaurus_lookup
+(
+    id integer NOT NULL,
+    synonymList text NOT NULL,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE public.thesaurus_lookup
+    OWNER to helium24;
+
+CREATE TABLE public.thesaurus
+(
+    id serial NOT NULL,
+    word text NOT NULL,
+    synonym_ids text NOT NULL,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE public.thesaurus
+    OWNER to helium24;
+    
+psql -U helium24 -d words
+\copy public.thesaurus_lookup (id,synonymList) FROM /home/helium24/lines.csv WITH (FORMAT csv, DELIMITER '|')
+\copy public.thesaurus (word, synonym_ids) FROM /home/helium24/mapping.csv WITH (FORMAT csv, DELIMITER '|')

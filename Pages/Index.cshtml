@@ -6,6 +6,9 @@
     var substitutionCollapse = "substitutionCollapse";
     var wordSearchCollapse = "wordSearchCollapse";
     var crosswordSearchCollapse = "crosswordSearchCollapse";
+    var wordExtraCollapse = "wordExtraCollapse";
+    var equationSolverCollapse = "equationSolverCollapse";
+    var dataLinksCollapse = "dataLinksCollapse";
 
     var listButton = "list-group-item list-group-item-action";
     var minimalisticPadding = "padding: 1px; margin: 2px;";
@@ -16,29 +19,23 @@
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@substitutionCollapse" style=" @Html.Raw(minimalisticPadding)">Substitution</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Word Search</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@crosswordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Crossword Search</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordExtraCollapse" style=" @Html.Raw(minimalisticPadding)">Word Extra (in progress)</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@equationSolverCollapse" style=" @Html.Raw(minimalisticPadding)">Equation Solver (in progress)</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@dataLinksCollapse" style=" @Html.Raw(minimalisticPadding)">Data Links</button>
 }
 
-    <div class="container-fluid">
+<div class="container-fluid">
+    <div class="collapse" id="@substitutionCollapse" style="transition-duration: 0.05s;">
         <div class="row">
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">I:</span>
-                    </div>
-                    <textarea class="form-control" type="text" data-bind="value: input, valueUpdate: 'afterkeydown'" style="height:250px;"></textarea>
-                </div>
-            </div>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">O:</span>
-                    </div>
-                    <textarea class="form-control" type="text" data-bind="value: global.outputGlobal" style="height:250px;"></textarea>
-                </div>
-            </div>
-        </div>
-        <div class="collapse" id="@substitutionCollapse" style="transition-duration: 0.05s;">
             <div class="row">
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">I:</span>
+                        </div>
+                        <textarea class="form-control" type="text" data-bind="value: subst.input, valueUpdate: 'afterkeydown'" style="height:250px;"></textarea>
+                    </div>
+                </div>
                 <div class="col">
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -56,83 +53,202 @@
                     <div class="list-group">
                         <a data-bind="css: subst.aciiActive, click: utility.toggler.bind($data, subst.aciiActive)" class="@listButton active" @Html.Raw(noSelectStyle)>ASCII</a>
                     </div>
+                    <!--TODO: binary, ternary, hex, morse-->
 
                     <div class="row">
                         <div class="col-sm-auto">
                             Delimiter:
-                            <input data-bind="value: subst.delimiter, valueUpdate: 'afterkeydown'" style="width: 80px;" />
+                            <input data-bind="value: subst.delimiter, valueUpdate: 'afterkeydown'" style="width: 80px;" class="list-group-item" />
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="collapse" id="@wordSearchCollapse" style="transition-duration: 0.05s;">
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">O:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: wordSearch.output" style="height:250px;"></textarea>
-                    </div>
-                </div>
-                <div class="col-sm-auto">
-                    <div class="row">
-                        Query
-                    </div>
-                    <div class="row">
-                        <input data-bind="value: wordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
-                    </div>
-                    <div class="row">
-                        <input type="checkbox" data-bind="checked: wordSearch.searchType" /> Uncheck for anagrams.
-                    </div>
-                    <div class="row alert alert-success">
-                        <span data-bind="text: wordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
-                    </div>
-                    <div class="row alert alert-info">
-                        <span data-bind="text: wordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="collapse" id="@crosswordSearchCollapse" style="transition-duration: 0.05s;">
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Q:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: crosswordSearch.clueOutput" style="height:250px;"></textarea>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">A:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: crosswordSearch.answerOutput" style="height:250px;"></textarea>
-                    </div>
-                </div>
-                <div class="col-sm-auto">
-                    <div class="row">
-                        Query
-                    </div>
-                    <div class="row">
-                        <input data-bind="value: crosswordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
-                    </div>
-                    <div class="row alert alert-success">
-                        <span data-bind="text: crosswordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
-                    </div>
-                    <div class="row alert alert-info">
-                        <span data-bind="text: crosswordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="collapse" id="@wordSearchCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">O:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: wordSearch.output" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-auto">
+                <div class="row">
+                    Query
+                </div>
+                <div class="row">
+                    <input data-bind="value: wordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
+                </div>
+                <div class="row">
+                    <input type="checkbox" data-bind="checked: wordSearch.searchType" /> Uncheck for anagrams.
+                </div>
+                <div class="row alert alert-success">
+                    <span data-bind="text: wordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
+                </div>
+                <div class="row alert alert-info">
+                    <span data-bind="text: wordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse" id="@crosswordSearchCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Q:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: crosswordSearch.clueOutput" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">A:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: crosswordSearch.answerOutput" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-auto">
+                <div class="row">
+                    Query
+                </div>
+                <div class="row">
+                    <input data-bind="value: crosswordSearch.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
+                </div>
+                <div class="row alert alert-success">
+                    <span data-bind="text: crosswordSearch.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
+                </div>
+                <div class="row alert alert-info">
+                    <span data-bind="text: crosswordSearch.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse" id="@equationSolverCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="row">
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">I:</span>
+                        </div>
+                        <textarea class="form-control" type="text" data-bind="value: equationSolver.input" style="height:250px;"></textarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">O:</span>
+                        </div>
+                        <textarea class="form-control" type="text" data-bind="value: equationSolver.output" style="height:250px;"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-auto">
+                    <div class="list-group">
+                        <a data-bind="css: equationSolver.additionActive, click: utility.toggler.bind($data, equationSolver.additionActive)" class="@listButton active" @Html.Raw(noSelectStyle)>Addition</a>
+                    </div>
+                    <div class="list-group" style="padding: 4px;">
+                        <button data-bind="click: equationSolver.evaluate" style="border: 1px;">Evaluate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="collapse" id="@wordExtraCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">O:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: wordExtra.output" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-auto">
+                <div class="row">
+                    Query
+                </div>
+                <div class="row">
+                    <input data-bind="value: wordExtra.query, valueUpdate: 'afterkeydown'" style="width: 200px;" />
+                </div>
+                <div class="row">
+                    <div class="input-group-text" style="@Html.Raw(minimalisticPadding)">
+                        <input type="radio" name="wordExtraGroup" value="thesaurus" data-bind="checked: wordExtra.searchType" /> Thesaurus
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group-text" style="@Html.Raw(minimalisticPadding)">
+                        <input type="radio" name="wordExtraGroup" value="homophones" data-bind="checked: wordExtra.searchType" /> Homophones
+                    </div>
+                </div>
+                <div class="row alert alert-success">
+                    <span data-bind="text: wordExtra.resultCount" style="@Html.Raw(minimalisticPadding)">0</span>
+                </div>
+                <div class="row alert alert-info">
+                    <span data-bind="text: wordExtra.dbStatus" style="@Html.Raw(minimalisticPadding)">Idle</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse" id="@dataLinksCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="col">
+                <h5>Art</h5>
+                <div class="list-group">
+                    <a href="https://en.wikipedia.org/wiki/Lists_of_celebrities">List of List of Celebrities</a>
+                </div>
+            </div>
+            <div class="col">
+                <h5>Financial</h5>
+                <div class="list-group">
+                    <a href="https://www.nyse.com/listings_directory/stock">NYSE Stock Tickers</a>
+                </div>
+            </div>
+            <div class="col">
+                <h5>Geography</h5>
+                <div class="list-group">
+                    <a href="https://en.wikipedia.org/wiki/List_of_sovereign_states">Countries</a>
+                    <a href="https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States">US States and Capitals</a>
+                    <a href="https://en.wikipedia.org/wiki/List_of_country_calling_codes">Country Calling Codes</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h5>Reference</h5>
+                <div class="list-group">
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/d/d1/Asl_alphabet_gallaudet.png">American Sign Language</a>
+                    <a href="https://www.pharmabraille.com/pharmaceutical-braille/the-braille-alphabet/">Braille</a>
+                    <a href="https://en.wikipedia.org/wiki/International_maritime_signal_flags">Maritime Signal Flags</a>
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/e/e0/FAA_Phonetic_and_Morse_Chart2.svg">NATO Phonetic Alphabet</a>
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/3/36/Pigpen_cipher_key.svg">Pigpen</a>
+                    <a href="https://en.wikipedia.org/wiki/Flag_semaphore">Semaphore Flags</a>
+                </div>
+            </div>
+            <div class="col">
+                <h5>Science</h5>
+                <div class="list-group">
+                    <a href="https://en.wikipedia.org/wiki/List_of_chemical_elements">Chemical Elements</a>
+                    <a href="https://en.wikipedia.org/wiki/Electronic_color_code">Resistor Color Codes</a>
+                </div>
+            </div>
+            <div class="col">
+                <h5>Sports</h5>
+                <div class="list-group">
+                    <a href="https://en.wikipedia.org/wiki/List_of_professional_sports_teams_in_the_United_States_and_Canada">Sports teams in US and Canada</a>
+                    <a href="https://en.wikipedia.org/wiki/National_Football_League">Football teams in US and Canada</a>
+                    <a href="https://en.wikipedia.org/wiki/List_of_football_clubs_in_England">Soccer clubs in England</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-@section Scripts {
-    <script type="text/javascript" src="~/Lib/requirejs-2.3.6/require.js"></script>
-    <script type="text/javascript" src="~/scripts/require-config.js"></script>
-    <script type="text/javascript">require(["scripts/app"])</script>
-}
+    @section Scripts {
+        <script type="text/javascript" src="~/Lib/requirejs-2.3.6/require.js"></script>
+        <script type="text/javascript" src="~/scripts/require-config.js"></script>
+        <script type="text/javascript">require(["scripts/app"])</script>
+    }
