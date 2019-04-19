@@ -73,3 +73,16 @@ ALTER TABLE public.thesaurus
 psql -U helium24 -d words
 \copy public.thesaurus_lookup (id,synonymList) FROM /home/helium24/lines.csv WITH (FORMAT csv, DELIMITER '|')
 \copy public.thesaurus (word, synonym_ids) FROM /home/helium24/mapping.csv WITH (FORMAT csv, DELIMITER '|')
+
+---- Homophones ----
+CREATE TABLE public.homophones
+(
+    id serial NOT NULL,
+    homophones text NOT NULL
+);
+
+ALTER TABLE public.homophones
+    OWNER to helium24;
+    
+psql -U helium24 -d words
+\copy public.homophones (homophones) FROM /home/helium24/homophones.txt 

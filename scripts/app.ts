@@ -129,16 +129,8 @@ class WordSearchModel {
             if (this.searchType()) { // == search
                 axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
                     .then((response) => {
-                        let data: WordSearchResult = response.data
-
-                        if (data.count < 0) {
-                            this.dbStatus("Query error: " + data.errorMessage);
-                        } else {
-                            this.dbStatus("Idle");
-
-                            this.resultCount(this.GetResultCountText(data.count));
-                            this.output(data.results.join("\n"));
-                        }
+                        let data: WordSearchResult = response.data;
+                        this.ApplySearchResults(data);
                     })
                     .catch((err) => {
                         this.dbStatus("Error: " + JSON.stringify(err));
@@ -146,15 +138,8 @@ class WordSearchModel {
             } else {
                 axios.get("/api/WordSearch/FindAnagrams?search=" + encodedQuery)
                     .then((response) => {
-                        let data: WordSearchResult = response.data
-
-                        if (data.count < 0) {
-                            this.dbStatus("Query error: " + data.errorMessage);
-                        } else {
-                            this.dbStatus("Idle");
-                            this.resultCount(this.GetResultCountText(data.count));
-                            this.output(data.results.join("\n"));
-                        }
+                        let data: WordSearchResult = response.data;
+                        this.ApplySearchResults(data);
                     })
                     .catch((err) => {
                         this.dbStatus("Error: " + JSON.stringify(err));
@@ -163,6 +148,17 @@ class WordSearchModel {
 
             return encodedQuery;
         })
+    }
+
+    ApplySearchResults(data: WordSearchResult) {
+        if (data.count < 0) {
+            this.dbStatus("Query error: " + data.errorMessage);
+        } else {
+            this.dbStatus("Idle");
+
+            this.resultCount(this.GetResultCountText(data.count));
+            this.output(data.results.join("\n"));
+        }
     }
 
     GetResultCountText(resultCount: number): string {
@@ -253,53 +249,47 @@ class WordExtraModel {
             this.dbStatus("Querying...");
             let encodedQuery = encodeURIComponent(this.query());
             if (this.searchType() === "thesaurus") {
-                this.output(this.query() + "thesaurus");
-                //axios.get("/api/WordSearch/FindMatchingWords?search=" + encodedQuery)
-                //    .then((response) => {
-                //        let data: WordSearchResult = response.data
-                //
-                //        if (data.count < 0) {
-                //            this.dbStatus("Query error: " + data.errorMessage);
-                //        } else {
-                //            this.dbStatus("Idle");
-                //
-                //            this.resultCount(this.GetResultCountText(data.count));
-                //            this.output(data.results.join("\n"));
-                //        }
-                //    })
-                //    .catch((err) => {
-                //        this.dbStatus("Error: " + JSON.stringify(err));
-                //    });
+                axios.get("/api/WordExtra/FindSynonyms?search=" + encodedQuery)
+                    .then((response) => {
+                        let data: WordSearchResult = response.data;
+                        this.ApplySearchResults(data, 10);
+                    })
+                    .catch((err) => {
+                        this.dbStatus("Error: " + JSON.stringify(err));
+                    });
             } else { // Currently homophones, TODO add more types
-                this.output(this.query() + "homophones");
-                //axios.get("/api/WordSearch/FindAnagrams?search=" + encodedQuery)
-                //    .then((response) => {
-                //        let data: WordSearchResult = response.data
-                //
-                //        if (data.count < 0) {
-                //            this.dbStatus("Query error: " + data.errorMessage);
-                //        } else {
-                //            this.dbStatus("Idle");
-                //            this.resultCount(this.GetResultCountText(data.count));
-                //            this.output(data.results.join("\n"));
-                //        }
-                //    })
-                //    .catch((err) => {
-                //        this.dbStatus("Error: " + JSON.stringify(err));
-                //    });
+                axios.get("/api/WordExtra/FindHomophones?search=" + encodedQuery)
+                    .then((response) => {
+                        let data: WordSearchResult = response.data;
+                        this.ApplySearchResults(data, 50);
+                    })
+                    .catch((err) => {
+                        this.dbStatus("Error: " + JSON.stringify(err));
+                    });
             }
 
             return encodedQuery;
         })
     }
 
-    // GetResultCountText(resultCount: number): string {
-    //     if (resultCount >= 200) {
-    //         return resultCount.toString() + " (limited!)";
-    //     }
-    // 
-    //     return resultCount.toString();
-    // }
+    ApplySearchResults(data: WordSearchResult, throttleLimit: number) {
+        if (data.count < 0) {
+            this.dbStatus("Query error: " + data.errorMessage);
+        } else {
+            this.dbStatus("Idle");
+
+            this.resultCount(this.GetResultCountText(data.count, throttleLimit));
+            this.output(data.results.join("\n"));
+        }
+    }
+
+    GetResultCountText(resultCount: number, throttleLimit: number): string {
+        if (resultCount >= throttleLimit) {
+            return resultCount.toString() + " (limited!)";
+        }
+    
+        return resultCount.toString();
+    }
 }
 
 class UtilityModel {
