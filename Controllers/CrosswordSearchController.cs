@@ -16,8 +16,8 @@ namespace H24.Modules
         public IActionResult FindMatchingWords([FromQuery]string search)
         {
             int resultCount = 0;
-            List<string> clueSearchResults = null;
-            List<string> answerSearchResults = null;
+            List<string> clueSearchResults = new List<string>();
+            List<string> answerSearchResults = new List<string>();
             string errorMessage = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(search))

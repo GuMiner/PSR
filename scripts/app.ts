@@ -257,7 +257,7 @@ class WordExtraModel {
                     .catch((err) => {
                         this.dbStatus("Error: " + JSON.stringify(err));
                     });
-            } else { // Currently homophones, TODO add more types
+            } else { // Homophones
                 axios.get("/api/WordExtra/FindHomophones?search=" + encodedQuery)
                     .then((response) => {
                         let data: WordSearchResult = response.data;
