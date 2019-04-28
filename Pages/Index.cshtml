@@ -186,30 +186,30 @@
     </div>
     <div class="collapse" id="@numberConversionCollapse" style="transition-duration: 0.05s;">
         <div class="row">
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">I:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: equationSolver.input" style="height:250px;"></textarea>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">I:</span>
                     </div>
+                    <textarea class="form-control" type="text" data-bind="textInput: equationSolver.input" style="height:250px;"></textarea>
                 </div>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">O:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: equationSolver.output" style="height:250px;"></textarea>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">O:</span>
                     </div>
+                    <textarea class="form-control" type="text" data-bind="value: equationSolver.output" style="height:250px;"></textarea>
                 </div>
-                <div class="col-sm-auto">
-                    <div class="list-group">
-                        <a data-bind="css: equationSolver.additionActive, click: utility.toggler.bind($data, equationSolver.additionActive)" class="@listButton active" @Html.Raw(noSelectStyle)>Addition</a>
-                    </div>
-                    <div class="list-group" style="padding: 4px;">
-                        <button data-bind="click: equationSolver.evaluate" style="border: 1px;">Evaluate</button>
-                    </div>
+            </div>
+            <div class="col-sm-auto">
+                <div class="list-group">
+                    Input Base: <br />
+                    <input data-bind="textInput: equationSolver.inputBase" style="width: 60px;" value="10" />
+                </div>
+                <div class="list-group">
+                    Delimiter: <br />
+                    <input data-bind="textInput: equationSolver.delimiter" style="width: 60px;" value="10" />
                 </div>
             </div>
         </div>

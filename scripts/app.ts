@@ -369,19 +369,40 @@ class WordExtraModel {
 class EquationSolverModel {
     input: KnockoutObservable<string>
 
-    additionActive: KnockoutObservable<string>
-    evaluate: () => void
+    delimiter: KnockoutObservable<string>
+    inputBase: KnockoutObservable<string>
 
     output: KnockoutObservable<string>
 
     constructor() {
         this.input = ko.observable("");
-        this.output = ko.observable("");
+        this.delimiter = ko.observable(" ");
+        this.inputBase = ko.observable("10");
 
-        this.additionActive = ko.observable("active");
-        this.evaluate = () => {
-            this.output(this.input() + this.additionActive());
-        };
+        this.output = ko.pureComputed(() => {
+            let outputString = "";
+
+            let base = parseInt(this.inputBase());
+            let delimiter = this.delimiter();
+            let parts = this.input().split(delimiter);
+            for (var j = 2; j <= 36; j++) {
+                // Header
+                let convertedNumbers = "(" + j + ") ";
+                if (j < 10) {
+                    convertedNumbers += " ";
+                }
+
+                // Convert values (read as base, output to base 'j')
+                for (var i = 0; i < parts.length; i++) {
+                    let number = parseInt(parts[i], base);
+                    convertedNumbers += (number.toString(j) + delimiter);
+                }
+
+                outputString += convertedNumbers + "\r\n";
+            }
+
+            return outputString;
+        });
     }
 }
 
