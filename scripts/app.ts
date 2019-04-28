@@ -121,11 +121,16 @@ class SubstitutionModel {
         return morseString;
     }
 
+    // https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+    static escapeRegExp(input: string) {
+        return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
     static parseMorseCharacter(character: string, dotChar: string, dashChar: string): string {
         // From https://en.wikipedia.org/wiki/Morse_code#/media/File:International_Morse_Code.svg
-
-        let dotCharRegex = new RegExp(dotChar, "g");
-        let dashCharRegex = new RegExp(dashChar, "g");
+        
+        let dotCharRegex = new RegExp(SubstitutionModel.escapeRegExp(dotChar), "g");
+        let dashCharRegex = new RegExp(SubstitutionModel.escapeRegExp(dashChar), "g");
         let normalizedCharacter = character.replace(dotCharRegex, ".").replace(dashCharRegex, "-");
         switch (normalizedCharacter) {
             case ".-": return "A";
