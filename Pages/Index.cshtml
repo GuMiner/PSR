@@ -3,63 +3,119 @@
 @{
     ViewData["Title"] = "Home page";
 
-    var substitutionCollapse = "substitutionCollapse";
-    var wordSearchCollapse = "wordSearchCollapse";
-    var crosswordSearchCollapse = "crosswordSearchCollapse";
-    var wordExtraCollapse = "wordExtraCollapse";
-    var equationSolverCollapse = "equationSolverCollapse";
-    var dataLinksCollapse = "dataLinksCollapse";
+    string helpCollapse = "helpCollapse";
+    string substitutionCollapse = "substitutionCollapse";
+    string wordSearchCollapse = "wordSearchCollapse";
+    string crosswordSearchCollapse = "crosswordSearchCollapse";
+    string wordExtraCollapse = "wordExtraCollapse";
+    string numberConversionCollapse = "numberConversionCollapse";
+    string dataLinksCollapse = "dataLinksCollapse";
 
-    var listButton = "list-group-item list-group-item-action";
-    var minimalisticPadding = "padding: 1px; margin: 2px;";
-    var noSelectStyle = "style=\"-ms-user-select: none; user-select: none; -moz-user-select: none; -webkit-user-select: none;\"";
+    string listButton = "list-group-item list-group-item-action";
+    string minimalisticPadding = "padding: 1px; margin: 2px;";
+    string noSelectStyle = "style=\"-ms-user-select: none; user-select: none; -moz-user-select: none; -webkit-user-select: none;\"";
 }
 
 @section Headers {
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@helpCollapse" style=" @Html.Raw(minimalisticPadding)">Help</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@substitutionCollapse" style=" @Html.Raw(minimalisticPadding)">Substitution</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Word Search</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@crosswordSearchCollapse" style=" @Html.Raw(minimalisticPadding)">Crossword Search</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@wordExtraCollapse" style=" @Html.Raw(minimalisticPadding)">Word Extra</button>
-    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@equationSolverCollapse" style=" @Html.Raw(minimalisticPadding)">Equation Solver (in progress)</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@numberConversionCollapse" style=" @Html.Raw(minimalisticPadding)">Number Conversion</button>
     <button type="button" class="btn btn-primary" data-toggle="collapse" href="#@dataLinksCollapse" style=" @Html.Raw(minimalisticPadding)">Data Links</button>
 }
 
 <div class="container-fluid">
+    <div class="collapse" id="@helpCollapse" style="transition-duration: 0.05s;">
+        <div class="row">
+            <div class="col">
+                <h5>Instructions</h5>
+                <h6>Navigation</h6>
+                <p>
+                    Use the buttons at the top to open and collapse data tabs.
+                    <br />
+                    Data will remain in each tab if it is collapsed, but will be discarded if the page is refreshed.
+                </p>
+                <p>
+                    
+                </p>
+                <h6>Searching</h6>
+                <p>
+                    All searches support SQL queries. Use a '_' for letters which must exist and a '%' as a wildcard.
+                </p>
+                <p>
+                    <i>Examples</i>
+                    <ul>
+                        <li>Find all results which start with 'fish': <b>fish%</b></li>
+                        <li>Find all results which contain 'cheese': <b>%cheese%</b></li>
+                        <li>Find all single-letter results: <b>_</b></li>
+                        <li>Find all two letter results which start with 'a': <b>a_</b></li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col">
+                <h5>About</h5>
+                <p>
+                    <b>PSR</b> is built on top several technologies. <br />
+                    The underlying website runs on ASP.NET Core with Razor Pages, Bootstrap, Typescript, and Knockout for UI; and Web API for database and API interoperability. <br />
+                    PostgreSQL provides SQL database support, with Axios simplifying the interactions between Typescript and Web API. <br />
+                    Finally, JQuery supports Bootstrap, Npgsql supports PostgreSQL C# operations, and Newtonsoft.JSON supports server-side JSON serialization.
+                </p>
+
+                <h5>Support</h5>
+                <p>
+                    For all support issues, please file an issue on the <a href="https://github.com/guminer/psr/issues">issue tracker page</a>.
+                </p>
+            </div>
+        </div>
+    </div>
     <div class="collapse" id="@substitutionCollapse" style="transition-duration: 0.05s;">
         <div class="row">
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">I:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="textInput: subst.input" style="height:250px;"></textarea>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">I:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="textInput: subst.input" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">O:</span>
+                    </div>
+                    <textarea class="form-control" type="text" data-bind="value: subst.output" style="height:250px;"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-auto">
+                <div class="row">
+                    <div class="col">
+                        Delimiter:
+                    </div>
+                    <div class="col">
+                        <input data-bind="textInput: subst.delimiter" style="width: 40px;" />
                     </div>
                 </div>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">O:</span>
-                        </div>
-                        <textarea class="form-control" type="text" data-bind="value: subst.output" style="height:250px;"></textarea>
-                    </div>
+                <div class="list-group">
+                    <a data-bind="css: subst.letterToNumberActive, click: utility.toggler.bind($data, subst.letterToNumberActive)" class="@listButton active" @Html.Raw(noSelectStyle)>A1 - Z26</a>
+                    <a data-bind="css: subst.rotate13Active, click: utility.toggler.bind($data, subst.rotate13Active)" class="@listButton active" @Html.Raw(noSelectStyle)>Rotate</a>
                 </div>
-                <div class="col-sm-auto">
-                    <div class="list-group">
-                        <a data-bind="css: subst.letterToNumberActive, click: utility.toggler.bind($data, subst.letterToNumberActive)" class="@listButton active" @Html.Raw(noSelectStyle)>A1 - Z26</a>
-                        <a data-bind="css: subst.rotate13Active, click: utility.toggler.bind($data, subst.rotate13Active)" class="@listButton active" @Html.Raw(noSelectStyle)>Rotate</a>
+                <input data-bind="textInput: subst.rotateValue" />
+                <div class="list-group">
+                    <a data-bind="css: subst.aciiActive, click: utility.toggler.bind($data, subst.aciiActive)" class="@listButton active" @Html.Raw(noSelectStyle)>ASCII</a>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <a data-bind="css: subst.morseActive, click: utility.toggler.bind($data, subst.morseActive)" class="@listButton" @Html.Raw(noSelectStyle)>Morse</a>
                     </div>
-                    <input data-bind="textInput: subst.rotateValue" />
-                    <div class="list-group">
-                        <a data-bind="css: subst.aciiActive, click: utility.toggler.bind($data, subst.aciiActive)" class="@listButton active" @Html.Raw(noSelectStyle)>ASCII</a>
+                    <div class="col">
+                        Dot: <br />
+                        <input data-bind="textInput: subst.morseDot" style="width: 40px;" value="." />
                     </div>
-                    <!--TODO: binary, ternary, hex, morse-->
-
-                    <div class="row">
-                        <div class="col-sm-auto">
-                            Delimiter:
-                            <input data-bind="textInput: subst.delimiter" style="width: 80px;" class="list-group-item" />
-                        </div>
+                    <div class="col">
+                        Dash: <br />
+                        <input data-bind="textInput: subst.morseDash" style="width: 40px;" value="-" />
                     </div>
                 </div>
             </div>
@@ -128,7 +184,7 @@
             </div>
         </div>
     </div>
-    <div class="collapse" id="@equationSolverCollapse" style="transition-duration: 0.05s;">
+    <div class="collapse" id="@numberConversionCollapse" style="transition-duration: 0.05s;">
         <div class="row">
             <div class="row">
                 <div class="col">
@@ -158,7 +214,7 @@
             </div>
         </div>
     </div>
-        <div class="collapse" id="@wordExtraCollapse" style="transition-duration: 0.05s;">
+    <div class="collapse" id="@wordExtraCollapse" style="transition-duration: 0.05s;">
         <div class="row">
             <div class="col">
                 <div class="input-group">
@@ -246,6 +302,7 @@
             </div>
         </div>
     </div>
+</div>
 
     @section Scripts {
         <script type="text/javascript" src="~/Lib/requirejs-2.3.6/require.js"></script>

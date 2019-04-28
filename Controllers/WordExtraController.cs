@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace H24.Modules
 {
@@ -61,10 +59,10 @@ namespace H24.Modules
             {
                 search = search.ToUpperInvariant();
                 DbServer.PerformQuery((connection) =>
-                {
-                    resultCount = this.GetThesaurusResultCount(search, connection);
-                    searchResults = this.GetThesaurusResults(search, connection);
-                },
+                    {
+                        resultCount = this.GetThesaurusResultCount(search, connection);
+                        searchResults = this.GetThesaurusResults(search, connection);
+                    },
                     (ex) =>
                     {
                         resultCount = -1;
@@ -87,30 +85,21 @@ namespace H24.Modules
 
         private int GetThesaurusResultCount(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT COUNT(*) FROM thesaurus WHERE UPPER(word) LIKE :queryToExecute", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (dataReader.Read())
-                {
-                    count = (int)(long)dataReader[0];
-                }
-
-                return count;
-            }
+            return DbServer.ExecuteRead(
+                "SELECT COUNT(*) FROM thesaurus WHERE UPPER(word) LIKE :queryToExecute",
+                connection,
+                (dataReader) => (int)(long)dataReader[0],
+                new[] { new NpgsqlParameter("queryToExecute", search) }).First();
         }
 
         private List<string> GetThesaurusResults(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT word,synonym_ids FROM thesaurus WHERE UPPER(word) LIKE :queryToExecute ORDER BY word LIMIT 10", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
             Dictionary<int, HashSet<string>> synonymIds = new Dictionary<int, HashSet<string>>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
+
+            DbServer.ExecuteRead(
+                "SELECT word,synonym_ids FROM thesaurus WHERE UPPER(word) LIKE :queryToExecute ORDER BY word LIMIT 10",
+                connection,
+                (dataReader) =>
                 {
                     string word = (string)dataReader[0];
                     List<int> wordSynonymIds = ((string)dataReader[1]).Split(',').Select(item => int.TryParse(item, out int num) ? num : -1)
@@ -124,62 +113,46 @@ namespace H24.Modules
 
                         synonymIds[id].Add(word);
                     }
-                }
-            }
+                },
+                new[] { new NpgsqlParameter("queryToExecute", search) });
 
             List<string> results = new List<string>();
             if (synonymIds.Any())
             {
-                command = new NpgsqlCommand($"SELECT id,synonymlist FROM thesaurus_lookup WHERE ID IN ({string.Join(',', synonymIds.Keys)}) LIMIT 1000", connection);
-                using (NpgsqlDataReader dataReader = command.ExecuteReader())
-                {
-                    while (dataReader.Read())
+                results = DbServer.ExecuteRead(
+                    $"SELECT id,synonymlist FROM thesaurus_lookup WHERE ID IN ({string.Join(',', synonymIds.Keys)}) LIMIT 1000",
+                    connection,
+                    (dataReader) =>
                     {
                         int id = (int)dataReader[0];
                         string synonyms = (string)dataReader[1];
                         string wordsList = string.Join(", ", synonymIds[id]);
 
-                        results.Add($"{wordsList} => {synonyms}");
-                    }
-                }
+                        return $"{wordsList} => {synonyms}";
+                    });
             }
 
             return results;
         }
 
+
+
         private int GetResultCount(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT COUNT(*) FROM homophones WHERE UPPER(homophones) LIKE :queryToExecute", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (dataReader.Read())
-                {
-                    count = (int)(long)dataReader[0];
-                }
-
-                return count;
-            }
+            return DbServer.ExecuteRead(
+                "SELECT COUNT(*) FROM homophones WHERE UPPER(homophones) LIKE :queryToExecute",
+                connection,
+                (dataReader) => (int)(long)dataReader[0],
+                new[] { new NpgsqlParameter("queryToExecute", search) }).First();
         }
 
-        // TODO: homophones and synonyms should wrap in the scrolling view.
         private List<string> GetResults(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT homophones FROM homophones WHERE UPPER(homophones) LIKE :queryToExecute ORDER BY homophones LIMIT 50", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            List<string> words = new List<string>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
-                {
-                    words.Add((string)dataReader[0]);
-                }
-            }
-
-            return words;
+            return DbServer.ExecuteRead(
+               "SELECT homophones FROM homophones WHERE UPPER(homophones) LIKE :queryToExecute ORDER BY homophones LIMIT 50",
+               connection,
+               (dataReader) => (string)dataReader[0],
+               new[] { new NpgsqlParameter("queryToExecute", search) });
         }
     }
 }

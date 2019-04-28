@@ -8,6 +8,7 @@
     <None Remove="scripts\app.ts" />
     <None Remove="scripts\axios\axios.d.ts" />
     <None Remove="scripts\require-config.ts" />
+    <None Remove="scripts\utility.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="scripts\axios\axios.d.ts" />
@@ -22,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="scripts\utility.ts" />
     <TypeScriptCompile Include="scripts\app.ts" />
     <TypeScriptCompile Include="scripts\require-config.ts" />
   </ItemGroup>

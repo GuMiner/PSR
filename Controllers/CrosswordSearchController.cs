@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace H24.Modules
 {
@@ -26,8 +27,8 @@ namespace H24.Modules
                 DbServer.PerformQuery((connection) =>
                     {
                         resultCount = this.GetResultCount(search, connection);
-                        clueSearchResults = this.GetClueResults(search, connection);
-                        answerSearchResults = this.GetAnswerResults(search, connection);
+                        clueSearchResults = this.ExecuteClueAnswerQuery("clue", search, connection);
+                        answerSearchResults = this.ExecuteClueAnswerQuery("answer", search, connection);
                     },
                     (ex) =>
                     {
@@ -52,55 +53,24 @@ namespace H24.Modules
 
         private int GetResultCount(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT COUNT(*) FROM crosswords WHERE clue LIKE :queryToExecute OR answer LIKE :queryToExecute2", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute2", search));
-
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (dataReader.Read())
+            return DbServer.ExecuteRead(
+                "SELECT COUNT(*) FROM crosswords WHERE clue LIKE :queryToExecute OR answer LIKE :queryToExecute2",
+                connection,
+                (dataReader) => (int)(long)dataReader[0],
+                new[]
                 {
-                    count = (int)(long)dataReader[0];
-                }
-
-                return count;
-            }
+                    new NpgsqlParameter("queryToExecute", search),
+                    new NpgsqlParameter("queryToExecute2", search),
+                }).First();
         }
 
-        // TODO: words should wrap in the scrolling view
-        private List<string> GetClueResults(string search, NpgsqlConnection connection)
+        private List<string> ExecuteClueAnswerQuery(string filterColumn, string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE clue LIKE :queryToExecute ORDER BY clue LIMIT 200", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            List<string> words = new List<string>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
-                {
-                    words.Add($"{(string)dataReader[0]} => {(string)dataReader[1]}");
-                }
-            }
-
-            return words;
-        }
-
-        private List<string> GetAnswerResults(string search, NpgsqlConnection connection)
-        {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT clue, answer FROM crosswords WHERE answer LIKE :queryToExecute ORDER BY clue LIMIT 200", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            List<string> words = new List<string>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
-                {
-                    words.Add($"{(string)dataReader[0]} => {(string)dataReader[1]}");
-                }
-            }
-
-            return words;
+            return DbServer.ExecuteRead(
+                $"SELECT clue, answer FROM crosswords WHERE {filterColumn} LIKE :queryToExecute ORDER BY clue LIMIT 200",
+                connection,
+                (dataReader) => $"{(string)dataReader[0]} => {(string)dataReader[1]}",
+                new[] { new NpgsqlParameter("queryToExecute", search) });
         }
     }
 }

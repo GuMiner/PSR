@@ -1,5 +1,6 @@
 ﻿/// <reference path="axios/axios.d.ts" />
 /// <reference path="knockout/knockout.d.ts" />
+/// <reference path="utility.ts" />
 
 import * as axios from 'axios';
 import * as ko from "knockout";
@@ -11,8 +12,12 @@ class SubstitutionModel {
     rotate13Active: KnockoutObservable<string>
     rotateValue: KnockoutObservable<string>
     aciiActive: KnockoutObservable<string>
+    morseActive: KnockoutObservable<string>
 
     delimiter: KnockoutObservable<string>
+
+    morseDot: KnockoutObservable<string>
+    morseDash: KnockoutObservable<string>
 
     output: KnockoutObservable<string>
 
@@ -23,8 +28,11 @@ class SubstitutionModel {
         this.rotate13Active = ko.observable("active");
         this.rotateValue = ko.observable("13");
         this.aciiActive = ko.observable("active");
+        this.morseActive = ko.observable("");
 
         this.delimiter = ko.observable(" ");
+        this.morseDot = ko.observable(".");
+        this.morseDash = ko.observable("-");
 
         this.output = ko.pureComputed(() => {
             let outputString = "";
@@ -40,6 +48,10 @@ class SubstitutionModel {
 
             if (this.aciiActive()) {
                 outputString += SubstitutionModel.numberToAscii(parts) + "\r\n";
+            }
+
+            if (this.morseActive()) {
+                outputString += SubstitutionModel.convertMorse(parts, this.morseDot(), this.morseDash()) + "\r\n";
             }
 
             return outputString;
@@ -97,6 +109,63 @@ class SubstitutionModel {
         }
 
         return asciiString;
+    }
+
+    static convertMorse(parts: string[], dotChar: string, dashChar: string): string {
+        let morseString = "";
+        for (var i = 0; i < parts.length; i++) {
+            let letter = SubstitutionModel.parseMorseCharacter(parts[i], dotChar, dashChar);
+            morseString += letter;
+        }
+
+        return morseString;
+    }
+
+    static parseMorseCharacter(character: string, dotChar: string, dashChar: string): string {
+        // From https://en.wikipedia.org/wiki/Morse_code#/media/File:International_Morse_Code.svg
+
+        let dotCharRegex = new RegExp(dotChar, "g");
+        let dashCharRegex = new RegExp(dashChar, "g");
+        let normalizedCharacter = character.replace(dotCharRegex, ".").replace(dashCharRegex, "-");
+        switch (normalizedCharacter) {
+            case ".-": return "A";
+            case "-...": return "B";
+            case "-.-.": return "C";
+            case "-..": return "D";
+            case ".": return "E";
+            case "..-.": return "F";
+            case "--.": return "G";
+            case "....": return "H";
+            case "..": return "I";
+            case ".---": return "J";
+            case "-.-": return "K";
+            case ".-..": return "L";
+            case "--": return "M";
+            case "-.": return "N";
+            case "---": return "O";
+            case ".--.": return "P";
+            case "--.-": return "Q";
+            case ".-.": return "R";
+            case "...": return "S";
+            case "-": return "T";
+            case "..-": return "U";
+            case "...-": return "V";
+            case ".--": return "W";
+            case "-..-": return "X";
+            case "-.--": return "Y";
+            case "--..": return "Z";
+            case ".----": return "1";
+            case "..---": return "2";
+            case "...--": return "3";
+            case "....-": return "4";
+            case ".....": return "5";
+            case "-....": return "6";
+            case "--...": return "7";
+            case "---..": return "8";
+            case "----.": return "9";
+            case "-----": return "0";
+            default: return "?";
+        }
     }
 }
 
@@ -289,20 +358,6 @@ class WordExtraModel {
         }
     
         return resultCount.toString();
-    }
-}
-
-class UtilityModel {
-    toggler: (item: KnockoutObservable<string>) => void
-
-    constructor() {
-        this.toggler = (item: KnockoutObservable<string>) => {
-            if (item() === "") {
-                item("active");
-            } else {
-                item("");
-            }
-        }
     }
 }
 

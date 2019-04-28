@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace H24.Modules
@@ -85,72 +86,38 @@ namespace H24.Modules
 
         private int GetResultCount(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT COUNT(*) FROM words WHERE word LIKE :queryToExecute", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (dataReader.Read())
-                {
-                    count = (int)(long)dataReader[0];
-                }
-
-                return count;
-            }
+            return DbServer.ExecuteRead(
+                "SELECT COUNT(*) FROM words WHERE word LIKE :queryToExecute",
+                connection,
+                (dataReader) => (int)(long)dataReader[0],
+                new[] { new NpgsqlParameter("queryToExecute", search) }).First();
         }
 
-        // TODO: words should wrap in the scrolling view.
         private List<string> GetResults(string search, NpgsqlConnection connection)
         {
-            NpgsqlCommand command = new NpgsqlCommand("SELECT word FROM words WHERE word LIKE :queryToExecute ORDER BY word LIMIT 200", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            List<string> words = new List<string>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
-                {
-                    words.Add((string)dataReader[0]);
-                }
-            }
-
-            return words;
+            return DbServer.ExecuteRead(
+                "SELECT word FROM words WHERE word LIKE :queryToExecute ORDER BY word LIMIT 200",
+                connection,
+                (dataReader) => (string)dataReader[0],
+                new[] { new NpgsqlParameter("queryToExecute", search) });
         }
 
         private int GetAnagramResultCount(string search, NpgsqlConnection connection)
         {
             string anagramSearch = this.GetAnagramSearchQuery(search);
-            NpgsqlCommand command = new NpgsqlCommand($"SELECT COUNT(*) FROM words WHERE {anagramSearch}", connection);
-
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (dataReader.Read())
-                {
-                    count = (int)(long)dataReader[0];
-                }
-
-                return count;
-            }
+            return DbServer.ExecuteRead(
+                $"SELECT COUNT(*) FROM words WHERE {anagramSearch}",
+                connection,
+                (dataReader) => (int)(long)dataReader[0]).First();
         }
 
         private List<string> GetAnagramResults(string search, NpgsqlConnection connection)
         {
             string anagramSearch = this.GetAnagramSearchQuery(search);
-            NpgsqlCommand command = new NpgsqlCommand($"SELECT word FROM words WHERE {anagramSearch} ORDER BY word LIMIT 200", connection);
-            command.Parameters.Add(new NpgsqlParameter("queryToExecute", search));
-
-            List<string> words = new List<string>();
-            using (NpgsqlDataReader dataReader = command.ExecuteReader())
-            {
-                while (dataReader.Read())
-                {
-                    words.Add((string)dataReader[0]);
-                }
-            }
-
-            return words;
+            return DbServer.ExecuteRead(
+                $"SELECT word FROM words WHERE {anagramSearch} ORDER BY word LIMIT 200",
+                connection,
+                (dataReader) => (string)dataReader[0]);
         }
 
         private string GetAnagramSearchQuery(string search)
