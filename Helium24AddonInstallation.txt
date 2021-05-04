@@ -35,12 +35,12 @@ server {
 
     listen [::]:8642 ssl ipv6only=on;
     listen 8642 ssl;
-    error_page 8642 https://$host:8642$request_uri;
+    error_page 497 https://$host:8642$request_uri;
     ssl_certificate /etc/letsencrypt/live/helium24.net/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/helium24.net/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 <<
-cp /etc/nginx/sites-available/helium24-psr.net /etc/nginx/sites-enabled/helium24-psr.net
+ln -s /etc/nginx/sites-available/helium24-psr.net /etc/nginx/sites-enabled/helium24-psr.net
 systemctl restart nginx
